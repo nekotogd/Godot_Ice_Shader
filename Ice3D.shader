@@ -1,12 +1,20 @@
+// Port of Unity Ice Shader to Godot
+// by NekotoArts
+// OG Shader here - https://www.youtube.com/watch?v=Gym5JWHgjkk
+//
+//
+// my bruddahs dont dab we just Vossi Bop
+
 shader_type spatial;
-render_mode depth_draw_alpha_prepass, specular_schlick_ggx, unshaded;
+render_mode depth_prepass_alpha, specular_schlick_ggx;
 
 uniform float FresnelPower = 2.5;
-uniform vec4 FresnelColor : hint_color;
-uniform vec4 Color : hint_color;
+uniform vec4 FresnelColor : source_color;
+uniform vec4 Color : source_color;
 uniform vec3 Tiling = vec3(1.0, 1.0, 0.0);
 uniform vec3 Offset = vec3(0.0, 0.0, 0.0);
-uniform sampler2D Ice_Texture : hint_albedo;
+uniform sampler2D Ice_Texture : source_color;
+uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
 uniform float RefractionAmount = 1.0;
 uniform float Metallic = 0.134;
 uniform float Smoothness = 0.627;
@@ -111,7 +119,7 @@ void fragment() {
 	vec3 n_out8p0;
 	float n_out8p1;
 	{
-		vec4 SCREEN_TEXTURE_tex_read = texture(SCREEN_TEXTURE, n_out15p0.xy);
+		vec4 SCREEN_TEXTURE_tex_read = texture(screen_texture, n_out15p0.xy);
 		n_out8p0 = SCREEN_TEXTURE_tex_read.rgb;
 		n_out8p1 = SCREEN_TEXTURE_tex_read.a;
 	}
@@ -137,7 +145,7 @@ void fragment() {
 // ReadNormalMap:18
 	vec3 n_out18p0;
 	{
-		n_out18p0 = read_normalmap(n_out11p0, vec3(n_out4p0), TANGENT, BINORMAL, NORMALMAP_DEPTH);
+		n_out18p0 = read_normalmap(n_out11p0, NORMAL, TANGENT, BINORMAL, n_out4p0);
 	}
 
 // Output:0
